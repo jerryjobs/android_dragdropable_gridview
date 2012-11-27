@@ -3,6 +3,8 @@
  */
 package cn.classd.dragablegrid.widget;
 
+import cn.classd.dragablegrid.R;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
@@ -12,17 +14,18 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.AlphaAnimation;
 import android.widget.GridView;
 import android.widget.ImageView;
+
 
 /**
  * @author guojie
  * 
  * 
- * 已知问题列表：2：垂直滚动条 
+ *         已知问题列表： 1：垂直滚动条
  * 
  */
 public class DragableGridview extends GridView implements OnGestureListener {
@@ -35,13 +38,13 @@ public class DragableGridview extends GridView implements OnGestureListener {
 	private WindowManager				mWindowManager;
 	private WindowManager.LayoutParams	mWindowParams;
 
-	private int							mDragPointX;				
-																	
-	private int							mDragPointY;				
-																	
-	private int							mXOffset;					
-																	
-	private int							mYOffset;					
+	private int							mDragPointX;				// at what x offset inside the item did the user
+																	// grab it
+	private int							mDragPointY;				// at what y offset inside the item did the user
+																	// grab it
+	private int							mXOffset;					// the difference between screen coordinates and
+																	// coordinates in this view
+	private int							mYOffset;					// the difference between screen coordinates and
 
 	private Bitmap						mDragBitmap;
 	
@@ -86,7 +89,6 @@ public class DragableGridview extends GridView implements OnGestureListener {
 
 				if (mDragView != null) {
 					dragView(newX, newY);
-					showSelectItem();
 					dropedItemIndex = pointToPosition(newX, newY);
 				}
 				return true;
@@ -107,19 +109,19 @@ public class DragableGridview extends GridView implements OnGestureListener {
 
 	private void startDragging() {
 		dragedItemIndex = pointToPosition(lastX, lastY);
-
+		
 		if (dragedItemIndex != -1) {
 			ViewGroup item = (ViewGroup) getChildAt(dragedItemIndex);
 			mDragPointX = lastX - item.getLeft();
 			mDragPointY = lastY - item.getTop();
-
+			
 			item.setDrawingCacheEnabled(true);
 			Bitmap bitmap = Bitmap.createBitmap(item.getDrawingCache());
 			
 			mWindowParams = new WindowManager.LayoutParams();
 			mWindowParams.gravity = Gravity.TOP | Gravity.LEFT;
-			mWindowParams.x = lastX;// - mDragPointX; //+ mXOffset;
-			mWindowParams.y = lastY;// - mDragPointY; // + mYOffset;
+			mWindowParams.x = mXOffset - lastX + item.getLeft();
+			mWindowParams.y = mYOffset - lastY + item.getTop();
 
 			mWindowParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
 			mWindowParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
@@ -136,24 +138,19 @@ public class DragableGridview extends GridView implements OnGestureListener {
 			v.setImageBitmap(bitmap);
 			mDragBitmap = bitmap;
 			
-//			TranslateAnimation translate = new TranslateAnimation(Animation.ABSOLUTE, mDragPointX, Animation.ABSOLUTE,
-//					mWindowParams.x, Animation.ABSOLUTE, mDragPointY, Animation.ABSOLUTE, mWindowParams.y);
-//			translate.setDuration(animT);
-//			translate.setFillEnabled(true);
-//			translate.setFillAfter(true);
-//			v.clearAnimation();
-//			v.startAnimation(translate);
-
 			mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 			mWindowManager.addView(v, mWindowParams);
 			mDragView = v;
+			mDragView.setVisibility(View.GONE);
 		}
 	}
 
 	private void dragView(int x, int y) {
 
+		if (mDragView.getVisibility() == View.GONE)
+			mDragView.setVisibility(View.VISIBLE);
 		mWindowParams.x = x - mDragPointX;
-		mWindowParams.y = y;// - mDragPointY;
+		mWindowParams.y = y;
 		mWindowManager.updateViewLayout(mDragView, mWindowParams);
 	}
 
@@ -178,15 +175,13 @@ public class DragableGridview extends GridView implements OnGestureListener {
 
 		if (dragedItemIndex != -1 && dropedItemIndex != -1 && dragedItemIndex != dropedItemIndex) {
 
+			// 对外传出改变的位置
 			if (onSwappingListener != null)
 				onSwappingListener.waspping(dragedItemIndex, dropedItemIndex);
-
+			
 			dragedItemIndex = -1;
 			dropedItemIndex = -1;
 		}
-	}
-
-	private void showSelectItem() {
 	}
 
 	public void setOnSwappingListener(OnSwappingListener l) {
@@ -227,19 +222,22 @@ public class DragableGridview extends GridView implements OnGestureListener {
 
 	boolean	mIsDragging	= false;
 	
-	private ViewGroup dragedView;
 
 	@Override
 	public void onLongPress(MotionEvent ev) {
+		
+		this.invalidate();
+		
 		mIsDragging = true;
 		lastX = (int) ev.getX();
 		lastY = (int) ev.getY();
 
-		startDragging();
+		mXOffset = (int) ev.getRawX();
+		mYOffset = (int) ev.getRawY();
 		
-//		AlphaAnimation alphaAnimation = new AlphaAnimation(.6f, 1f);
-//		alphaAnimation.setDuration(animT);
-//		dragedView.startAnimation(alphaAnimation);
+		((ImageView)getChildAt(pointToPosition((int) ev.getX(), (int) ev.getY())).findViewById(R.id.imageView1)).setAlpha(255);
+		
+		startDragging();
 	}
 
 	@Override
@@ -249,14 +247,10 @@ public class DragableGridview extends GridView implements OnGestureListener {
 
 	@Override
 	public void onShowPress(MotionEvent e) {
-		int index = pointToPosition((int) e.getX(), (int) e.getY());
-		if (index != -1) {
-			dragedView = (ViewGroup) getChildAt(index);
-			AlphaAnimation alphaAnimation = new AlphaAnimation(1f, .6f);
-			alphaAnimation.setDuration(animT);
-			dragedView.clearAnimation();
-			dragedView.startAnimation(alphaAnimation);
-		}
+		
+		this.invalidate();
+		
+		((ImageView)getChildAt(pointToPosition((int) e.getX(), (int) e.getY())).findViewById(R.id.imageView1)).setAlpha(155);
 	}
 
 	@Override
