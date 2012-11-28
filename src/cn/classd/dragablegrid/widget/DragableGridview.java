@@ -102,8 +102,6 @@ public class DragableGridview extends GridView implements OnGestureListener {
 			if (mIsScrolling) {
 
 				if (scroll < 0) {
-					mIsScrolling = false;
-					
 					if (null != smoothScrollRunnable) {
 						smoothScrollRunnable.stop();
 					}
@@ -114,8 +112,6 @@ public class DragableGridview extends GridView implements OnGestureListener {
 				}
 
 				if (scroll > maxScroll) {
-					mIsScrolling = false;
-					
 					if (null != smoothScrollRunnable) {
 						smoothScrollRunnable.stop();
 					}
@@ -123,6 +119,8 @@ public class DragableGridview extends GridView implements OnGestureListener {
 					handler.post(smoothScrollRunnable);
 					scroll = maxScroll;
 				}
+				
+				mIsScrolling = false;
 			}
 		}
 		return mIsDragging;
@@ -197,7 +195,6 @@ public class DragableGridview extends GridView implements OnGestureListener {
 
 		if (dragedItemIndex != -1 && dropedItemIndex != -1 && dragedItemIndex != dropedItemIndex) {
 
-			// 对外传出改变的位置
 			if (onSwappingListener != null)
 				onSwappingListener.waspping(dragedItemIndex, dropedItemIndex);
 
@@ -310,7 +307,7 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		}
 		
 		if (maxScroll < getHeight()) {
-			maxScroll = 0;//maxScroll - getHeight();
+			maxScroll = 0;
 			return maxScroll;
 		} else {
 			maxScroll -= getHeight();
@@ -319,17 +316,10 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		return maxScroll;
 	}
 
-	/**
-	 * @return the enable
-	 */
 	public boolean isEnable() {
 		return enable;
 	}
 
-	/**
-	 * @param enable
-	 *            the enable to set
-	 */
 	public void setEnable(boolean enable) {
 		this.enable = enable;
 	}
