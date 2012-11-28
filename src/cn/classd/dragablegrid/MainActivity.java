@@ -101,10 +101,17 @@ public class MainActivity extends Activity {
     
     private void initTestData() {
     	books = new ArrayList<Book>();
+    	
+		for (int i = 0; i < 1; i++) {
+			setBooks();
+		}
+    }
+    
+    private void setBooks() {
+    	
     	String[] bookNames = getResources().getStringArray(R.array.books);
     	
     	Book book = new Book();
-    	
     	book.setId(1);
     	book.setName(bookNames[0]);
     	book.setBitmapId(R.drawable.b001);
