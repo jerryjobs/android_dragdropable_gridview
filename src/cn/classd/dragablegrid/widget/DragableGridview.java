@@ -34,7 +34,6 @@ public class DragableGridview extends GridView implements OnGestureListener {
 	private WindowManager				mWindowManager;
 	private WindowManager.LayoutParams	mWindowParams;
 	private int							mDragPointX;					// at what x offset inside the item did the user
-	private int							mDragPointY;					// at what y offset inside the item did the user
 	private int							mXOffset;						// the difference between screen coordinates and
 	private int							mYOffset;						// the difference between screen coordinates and
 	private Bitmap						mDragBitmap;
@@ -43,6 +42,10 @@ public class DragableGridview extends GridView implements OnGestureListener {
 	int									dropedItemIndex;
 	private OnSwappingListener			onSwappingListener;
 	private OnItemClickListener			onItemClickListener;
+	
+	boolean								mIsDragging		= false;
+	boolean								mIsScrolling	= false;
+	int									scroll			= 0, maxScroll = 0;
 
 	private GestureDetector				mGesture;
 	// anim vars
@@ -60,7 +63,7 @@ public class DragableGridview extends GridView implements OnGestureListener {
 	public DragableGridview(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		colCount = attrs.getAttributeIntValue("android", "numColumns", 3);
-		mGesture = new GestureDetector(this);
+		mGesture = new GestureDetector(getContext(), this);
 	}
 
 	@Override
@@ -132,7 +135,7 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		if (dragedItemIndex != -1) {
 			ViewGroup item = (ViewGroup) getChildAt(dragedItemIndex);
 			mDragPointX = lastX - item.getLeft();
-			mDragPointY = lastY - item.getTop();
+//			mDragPointY = lastY - item.getTop();
 
 			item.setDrawingCacheEnabled(true);
 			Bitmap bitmap = Bitmap.createBitmap(item.getDrawingCache());
@@ -211,24 +214,6 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		this.onItemClickListener = l;
 	}
 
-	/**
-	 * 调换位置传
-	 * 
-	 * @author guojie
-	 */
-	public interface OnSwappingListener {
-		public abstract void waspping(int oldIndex, int newIndex);
-	}
-
-	/**
-	 * 传出itemOnClick事件
-	 * 
-	 * @author guojie
-	 */
-	public interface OnItemClickListener {
-		public abstract void click(int index);
-	}
-
 	@Override
 	public boolean onDown(MotionEvent ev) {
 		maxScroll = getMaxScroll();
@@ -241,12 +226,7 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		return false;
 	}
 
-	boolean	mIsDragging		= false;
-
-	boolean	mIsScrolling	= false;
-
-	int		scroll			= 0, maxScroll = 0;
-
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onLongPress(MotionEvent ev) {
 
@@ -280,11 +260,11 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		return false;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onShowPress(MotionEvent e) {
 
 		this.invalidate();
-
 		((ImageView) getChildAt(pointToPosition((int) e.getX(), (int) e.getY())).findViewById(R.id.imageView1))
 				.setAlpha(155);
 	}
@@ -305,25 +285,17 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		if (rowCount > 0) {
 			maxScroll = getChildAt(0).getHeight() * rowCount;
 		}
-		
+
 		if (maxScroll < getHeight()) {
 			maxScroll = 0;
 			return maxScroll;
 		} else {
 			maxScroll -= getHeight();
 		}
-		
+
 		return maxScroll;
 	}
 
-	public boolean isEnable() {
-		return enable;
-	}
-
-	public void setEnable(boolean enable) {
-		this.enable = enable;
-	}
-	
 	final class SmoothScrollRunnable implements Runnable {
 
 		static final int ANIMATION_DURATION_MS = 200;
@@ -382,4 +354,22 @@ public class DragableGridview extends GridView implements OnGestureListener {
 			this.handler.removeCallbacks(this);
 		}
 	};
+	
+	/**
+	 * 调换位置传
+	 * 
+	 * @author guojie
+	 */
+	public interface OnSwappingListener {
+		public abstract void waspping(int oldIndex, int newIndex);
+	}
+
+	/**
+	 * 传出itemOnClick事件
+	 * 
+	 * @author guojie
+	 */
+	public interface OnItemClickListener {
+		public abstract void click(int index);
+	}
 }
