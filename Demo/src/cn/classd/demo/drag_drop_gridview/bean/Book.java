@@ -1,7 +1,7 @@
 /**
  * Copyright 2012 Easy Read Tech. All rights reserved.
  */
-package cn.classd.dragablegrid.beans;
+package cn.classd.demo.drag_drop_gridview.bean;
 
 import java.io.Serializable;
 

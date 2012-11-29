@@ -1,4 +1,4 @@
-package cn.classd.dragablegrid;
+package cn.classd.demo.drag_drop_gridview;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import cn.classd.dragablegrid.beans.Book;
+import cn.classd.demo.drag_drop_gridview.bean.Book;
 import cn.classd.dragablegrid.widget.DragableGridview;
 import cn.classd.dragablegrid.widget.DragableGridview.OnItemClickListener;
 import cn.classd.dragablegrid.widget.DragableGridview.OnSwappingListener;

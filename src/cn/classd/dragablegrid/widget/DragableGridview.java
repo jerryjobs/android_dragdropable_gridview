@@ -239,8 +239,8 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		mXOffset = (int) ev.getRawX();
 		mYOffset = (int) ev.getRawY();
 
-		((ImageView) getChildAt(pointToPosition((int) ev.getX(), (int) ev.getY())).findViewById(R.id.imageView1))
-				.setAlpha(255);
+//		((ImageView) getChildAt(pointToPosition((int) ev.getX(), (int) ev.getY())).findViewById(R.id.imageView1))
+//				.setAlpha(255);
 
 		startDragging();
 	}
@@ -265,8 +265,8 @@ public class DragableGridview extends GridView implements OnGestureListener {
 	public void onShowPress(MotionEvent e) {
 
 		this.invalidate();
-		((ImageView) getChildAt(pointToPosition((int) e.getX(), (int) e.getY())).findViewById(R.id.imageView1))
-				.setAlpha(155);
+//		((ImageView) getChildAt(pointToPosition((int) e.getX(), (int) e.getY())).findViewById(R.id.imageView1))
+//				.setAlpha(155);
 	}
 
 	@Override
