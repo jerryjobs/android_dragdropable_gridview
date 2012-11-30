@@ -5,6 +5,7 @@ package cn.classd.dragablegrid.widget;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -59,6 +60,8 @@ public class DragableGridview extends GridView implements OnGestureListener {
 	private Handler						handler		= new Handler();
 
 	private SmoothScrollRunnable		smoothScrollRunnable;
+	
+	private int							mSelectedItemBgColor;
 
 	public DragableGridview(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -226,7 +229,6 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		return false;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onLongPress(MotionEvent ev) {
 
@@ -239,8 +241,8 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		mXOffset = (int) ev.getRawX();
 		mYOffset = (int) ev.getRawY();
 
-//		((ImageView) getChildAt(pointToPosition((int) ev.getX(), (int) ev.getY())).findViewById(R.id.imageView1))
-//				.setAlpha(255);
+		View v = getChildAt(pointToPosition((int) ev.getX(), (int) ev.getY()));
+		showSelectItem(v, false);
 
 		startDragging();
 	}
@@ -260,15 +262,14 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		return false;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onShowPress(MotionEvent e) {
 
 		this.invalidate();
-//		((ImageView) getChildAt(pointToPosition((int) e.getX(), (int) e.getY())).findViewById(R.id.imageView1))
-//				.setAlpha(155);
+		View v = getChildAt(pointToPosition((int) e.getX(), (int) e.getY()));
+		showSelectItem(v, true);
 	}
-
+	
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
 		if (!mIsDragging) {
@@ -355,6 +356,13 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		}
 	};
 	
+	private void showSelectItem(View item, boolean isShow) {
+		if (isShow)
+			item.setBackgroundColor(Color.WHITE);
+		else
+			item.setBackgroundColor(0);
+	}
+	
 	/**
 	 * 调换位置传
 	 * 
@@ -371,5 +379,12 @@ public class DragableGridview extends GridView implements OnGestureListener {
 	 */
 	public interface OnItemClickListener {
 		public abstract void click(int index);
+	}
+
+	/**
+	 * @param mSelectedItemBgColor the mSelectedItemBgColor to set
+	 */
+	public void setmSelectedItemBgColor(int mSelectedItemBgColor) {
+		this.mSelectedItemBgColor = mSelectedItemBgColor;
 	}
 }
