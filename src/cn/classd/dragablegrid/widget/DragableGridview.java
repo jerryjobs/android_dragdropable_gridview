@@ -89,7 +89,7 @@ public class DragableGridview extends GridView implements OnGestureListener {
 
 				if (mDragView != null) {
 					dragView(newX, newY);
-					dropedItemIndex = pointToPosition(newX, newY);
+					dropedItemIndex = pointToPosition(newX, newY + scroll);
 				}
 				
 				return true;
@@ -137,7 +137,7 @@ public class DragableGridview extends GridView implements OnGestureListener {
 	}
 
 	private void startDragging() {
-		dragedItemIndex = pointToPosition(lastX, lastY);
+		dragedItemIndex = pointToPosition(lastX, lastY + scroll);
 
 		if (dragedItemIndex != -1) {
 			ViewGroup item = (ViewGroup) getChildAt(dragedItemIndex);
@@ -296,41 +296,6 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		super.onMeasure(widthMeasureSpec, expandSpec);
 	}
 	
-//	public int pointToPosition(int x, int y) {
-//		//y + scroll
-//		int rowCount = (int) Math.ceil((double) getChildCount() / colCount);
-//		int itemHeight = getChildAt(0).getHeight();
-//		int itemWidth = getChildAt(0).getWidth();
-//		int heiht = 0;
-//		if (rowCount > 0) {
-//			heiht = itemHeight * rowCount;
-//		}
-//		
-//		if (y + scroll > heiht) return -1;
-//		int row = ((y + scroll) / itemHeight);
-//		int cel = x / itemWidth;
-//		
-//		return -1;
-//	}
-	
-//	private int getMaxScroll() {
-//		int rowCount = (int) Math.ceil((double) getChildCount() / colCount);
-//		int maxScroll = 0;
-//		if (rowCount > 0) {
-//			maxScroll = getChildAt(0).getHeight() * rowCount;
-//		}
-//
-//		if (maxScroll < getHeight()) {
-//			maxScroll = 0;
-//			return maxScroll;
-//		} else {
-//			maxScroll -= getHeight();
-//		}
-//		Log.d(TAG, "maxScroll : " + maxScroll);
-//
-//		return maxScroll;
-//	}
-
 	final class SmoothScrollRunnable implements Runnable {
 
 		static final int ANIMATION_DURATION_MS = 200;
