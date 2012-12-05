@@ -134,5 +134,13 @@ public class MainActivity extends Activity {
     	book3.setName(bookNames[3]);
     	book3.setBitmapId(R.drawable.b004);
     	books.add(book3);
+    	
+    	for (int i=0; i<10; i++) {
+    		Book t = new Book();
+        	t.setId(4);
+        	t.setName(bookNames[3]);
+        	t.setBitmapId(R.drawable.b004);
+        	books.add(t);
+    	}
     }
 }

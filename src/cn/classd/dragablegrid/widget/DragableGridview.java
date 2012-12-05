@@ -10,6 +10,7 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.Gravity;
@@ -17,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.View.MeasureSpec;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.GridView;
@@ -279,6 +281,14 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		}
 		return false;
 	}
+	
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
+		super.onMeasure(widthMeasureSpec, expandSpec);
+		Log.d(TAG, "expandSpec : " + expandSpec);
+	}
+
 
 	private int getMaxScroll() {
 		int rowCount = (int) Math.ceil((double) getChildCount() / colCount);
@@ -293,6 +303,7 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		} else {
 			maxScroll -= getHeight();
 		}
+		Log.d(TAG, "maxScroll : " + maxScroll);
 
 		return maxScroll;
 	}
