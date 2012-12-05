@@ -130,6 +130,8 @@ public class DragableGridview extends GridView implements OnGestureListener {
 				
 				mIsScrolling = false;
 			}
+			
+//			this.invalidate();
 		}
 		return mIsDragging;
 	}
@@ -221,8 +223,11 @@ public class DragableGridview extends GridView implements OnGestureListener {
 
 	@Override
 	public boolean onDown(MotionEvent ev) {
-		maxScroll = getMaxScroll();
-
+		maxScroll = this.getHeight() - ((View) this.getParent()).getHeight();
+		
+		if (maxScroll <= 0)  {
+			maxScroll = 0;
+		}
 		return true;
 	}
 
@@ -243,7 +248,7 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		mXOffset = (int) ev.getRawX();
 		mYOffset = (int) ev.getRawY();
 
-		View v = getChildAt(pointToPosition((int) ev.getX(), (int) ev.getY()));
+		View v = getChildAt(pointToPosition((int) ev.getX(), (int) ev.getY() + scroll));
 		showSelectItem(v, false);
 
 		startDragging();
@@ -255,12 +260,15 @@ public class DragableGridview extends GridView implements OnGestureListener {
 		mIsScrolling = true;
 
 		if (scroll < 0 || scroll > maxScroll) {
-			scrollBy(0, (int) distanceY / 2);
-			scroll += distanceY / 2;
+			scrollBy(0, (int) distanceY / 3);
+			scroll += distanceY / 3;
 		} else {
 			scroll += distanceY;
 			scrollBy(0, (int) distanceY);
 		}
+		
+		Log.d(TAG, "getHeight : " + this.getHeight());
+		Log.d(TAG, "maxScroll : " + maxScroll);
 		return false;
 	}
 
@@ -268,14 +276,14 @@ public class DragableGridview extends GridView implements OnGestureListener {
 	public void onShowPress(MotionEvent e) {
 
 		this.invalidate();
-		View v = getChildAt(pointToPosition((int) e.getX(), (int) e.getY()));
+		View v = getChildAt(pointToPosition((int) e.getX(), (int) e.getY() + scroll));
 		showSelectItem(v, true);
 	}
 	
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
 		if (!mIsDragging) {
-			int index = pointToPosition((int) e.getX(), (int) e.getY());
+			int index = pointToPosition((int) e.getX(), (int) e.getY() + scroll);
 			if (index != -1)
 				onItemClickListener.click(index);
 		}
@@ -286,27 +294,42 @@ public class DragableGridview extends GridView implements OnGestureListener {
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
 		super.onMeasure(widthMeasureSpec, expandSpec);
-		Log.d(TAG, "expandSpec : " + expandSpec);
 	}
-
-
-	private int getMaxScroll() {
-		int rowCount = (int) Math.ceil((double) getChildCount() / colCount);
-		int maxScroll = 0;
-		if (rowCount > 0) {
-			maxScroll = getChildAt(0).getHeight() * rowCount;
-		}
-
-		if (maxScroll < getHeight()) {
-			maxScroll = 0;
-			return maxScroll;
-		} else {
-			maxScroll -= getHeight();
-		}
-		Log.d(TAG, "maxScroll : " + maxScroll);
-
-		return maxScroll;
-	}
+	
+//	public int pointToPosition(int x, int y) {
+//		//y + scroll
+//		int rowCount = (int) Math.ceil((double) getChildCount() / colCount);
+//		int itemHeight = getChildAt(0).getHeight();
+//		int itemWidth = getChildAt(0).getWidth();
+//		int heiht = 0;
+//		if (rowCount > 0) {
+//			heiht = itemHeight * rowCount;
+//		}
+//		
+//		if (y + scroll > heiht) return -1;
+//		int row = ((y + scroll) / itemHeight);
+//		int cel = x / itemWidth;
+//		
+//		return -1;
+//	}
+	
+//	private int getMaxScroll() {
+//		int rowCount = (int) Math.ceil((double) getChildCount() / colCount);
+//		int maxScroll = 0;
+//		if (rowCount > 0) {
+//			maxScroll = getChildAt(0).getHeight() * rowCount;
+//		}
+//
+//		if (maxScroll < getHeight()) {
+//			maxScroll = 0;
+//			return maxScroll;
+//		} else {
+//			maxScroll -= getHeight();
+//		}
+//		Log.d(TAG, "maxScroll : " + maxScroll);
+//
+//		return maxScroll;
+//	}
 
 	final class SmoothScrollRunnable implements Runnable {
 
@@ -369,7 +392,7 @@ public class DragableGridview extends GridView implements OnGestureListener {
 	
 	private void showSelectItem(View item, boolean isShow) {
 		if (isShow)
-			item.setBackgroundColor(Color.WHITE);
+			item.setBackgroundColor(Color.GRAY);
 		else
 			item.setBackgroundColor(0);
 	}
